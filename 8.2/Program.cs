@@ -1,18 +1,23 @@
 ﻿using System;
+using System.IO;
 
 class Program
 {
-    static string ReverseString(string input)
-    {
-        char[] chars = input.ToCharArray();
-        Array.Reverse(chars);
-        return new string(chars);
-    }
-
     static void Main()
     {
-        string text = "Привет мир";
-        string reversed = ReverseString(text);
-        Console.WriteLine(reversed);
+        Console.Write("Введите имя файла: ");
+        string fileName = Console.ReadLine();
+
+        if (!File.Exists(fileName))
+        {
+            Console.WriteLine("Файл не существует.");
+            return;
+        }
+
+        string content = File.ReadAllText(fileName);
+        string upperContent = content.ToUpper();
+        
+        File.WriteAllText("output.txt", upperContent);
+        Console.WriteLine("Данные записаны в output.txt");
     }
 }
