@@ -1,68 +1,81 @@
 ﻿using System;
-using System.Collections.Generic;
 
-class Song
+public enum AccountType
 {
-    string name;
-    string author;
-    Song prev;
+    Savings,
+    Checking,
+    Credit
+}
 
-    public void SetName(string n) { name = n; }
-    public void SetAuthor(string a) { author = a; }
-    public void SetPrev(Song p) { prev = p; }
-    
-    public void PrintInfo() { Console.WriteLine(Title()); }
-    public string Title() { return name + " - " + author; }
+public class BankAccount
+{
+    private static int _counter = 1000;
 
-    // Переопределяем метод сравнения
-    public override bool Equals(object d)
+    private string _number;
+    private decimal _balance;
+    private AccountType _type;
+
+    public string Number { get { return _number; } }
+    public decimal Balance { get { return _balance; } }
+    public AccountType Type { get { return _type; } }
+
+    public BankAccount(AccountType type, decimal initialBalance)
     {
-        if (d is Song other) // Если d — это песня
+        _type = type;
+        _balance = initialBalance;
+        _number = GenerateNumber();
+    }
+
+    private static string GenerateNumber()
+    {
+        _counter++;
+        return "ACC-" + _counter;
+    }
+
+    public void Deposit(decimal amount)
+    {
+        _balance += amount;
+    }
+
+    public bool Withdraw(decimal amount)
+    {
+        if (_balance >= amount)
         {
-            return this.name == other.name && this.author == other.author;
+            _balance -= amount;
+            return true;
         }
         return false;
     }
-    public override int GetHashCode() { return HashCode.Combine(name, author); }
+
+    public void Transfer(BankAccount source, decimal amount)
+    {
+        if (source.Withdraw(amount))
+        {
+            this.Deposit(amount);
+        }
+        else
+        {
+            Console.WriteLine("Перевод отклонен: недостаточно средств.");
+        }
+    }
 }
 
 class Program
 {
     static void Main()
     {
-        List<Song> songs = new List<Song>();
+        BankAccount acc1 = new BankAccount(AccountType.Savings, 5000);
+        BankAccount acc2 = new BankAccount(AccountType.Checking, 1000);
 
-        Song s1 = new Song();
-        s1.SetName("Песня 1");
-        s1.SetAuthor("Автор 1");
-        Song s2 = new Song();
-        s2.SetName("Песня 2");
-        s2.SetAuthor("Автор 2");
-        Song s3 = new Song();
-        s3.SetName("Песня 3");
-        s3.SetAuthor("Автор 3");
-        Song s4 = new Song();
-        s4.SetName("Песня 4");
-        s4.SetAuthor("Автор 4");
+        Console.WriteLine("Счет 1: " + acc1.Number + " | Баланс: " + acc1.Balance);
+        Console.WriteLine("Счет 2: " + acc2.Number + " | Баланс: " + acc2.Balance);
 
-        // Связываем (по заданию)
-        s2.SetPrev(s1);
-        s3.SetPrev(s2);
-        s4.SetPrev(s3);
+        acc1.Transfer(acc2, 500);
 
-        songs.Add(s1);
-        songs.Add(s2);
-        songs.Add(s3);
-        songs.Add(s4);
+        Console.WriteLine("После перевода 500 со счета 2 на счет 1:");
+        Console.WriteLine("Счет 1: " + acc1.Number + " | Баланс: " + acc1.Balance);
+        Console.WriteLine("Счет 2: " + acc2.Number + " | Баланс: " + acc2.Balance);
 
-        // Вывод в цикле
-        foreach (Song s in songs)
-        {
-            s.PrintInfo();
-        }
-
-        // Сравнение первых двух
-        if (songs[0].Equals(songs[1])) Console.WriteLine("Одинаковые");
-        else Console.WriteLine("Разные");
+        Console.ReadKey();
     }
 }
