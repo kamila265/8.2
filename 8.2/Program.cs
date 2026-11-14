@@ -2,17 +2,28 @@
 
 class Program
 {
-    static string ReverseString(string input)
+    static void CheckIFormattable(object obj)
     {
-        char[] chars = input.ToCharArray();
-        Array.Reverse(chars);
-        return new string(chars);
+        Console.WriteLine("--- Проверка оператором is ---");
+        if (obj is IFormattable)
+            Console.WriteLine("Объект реализует IFormattable");
+        else
+            Console.WriteLine("Объект НЕ реализует IFormattable");
+
+        Console.WriteLine("--- Проверка оператором as ---");
+        IFormattable formattable = obj as IFormattable;
+        if (formattable != null)
+            Console.WriteLine("Объект реализует IFormattable");
+        else
+            Console.WriteLine("Объект НЕ реализует IFormattable");
     }
 
     static void Main()
     {
-        string text = "Привет мир";
-        string reversed = ReverseString(text);
-        Console.WriteLine(reversed);
+        int number = 5;
+        string text = "hello";
+        
+        CheckIFormattable(number);
+        CheckIFormattable(text);
     }
 }
